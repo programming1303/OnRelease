@@ -187,7 +187,7 @@ class DataBase(object):
 
 		from time import mktime, gmtime, timezone
 
-		difference = - 3600 * 8
+		difference = - 28800 # - 3600 * 8 => - 28800 [V]
 		#timezone difference in seconds between GMT and west coast of USA
 
 		for download_time in range(int(mktime(self.info["last_connection_time"])) + 3600 - timezone, current_time - 3600, 3600):
@@ -241,7 +241,7 @@ class DataBase(object):
 				if event["type"] == "WatchEvent":
 					event["url"] = event["url"][19:]
 					print "Debug Info: (pair)", event["actor"], event["url"]
-					repo_id = self.get_id(self.repo_id, event["url"])
+					repo_id = event["repository"]["id"] # now id is GitHub repo id [V]
 					user_id = self.get_id(self.user_id, event["actor"])
 					self.create_or_check_path(join(self.database_dir, str(repo_id) + ".json"))
 					data_file = open(join(self.database_dir, str(repo_id) + ".json"), "r+w")
