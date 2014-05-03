@@ -19,10 +19,9 @@ class DataBase(object):
 
 	def __init__(self):
 		from os.path import join
+		from time import struct_time
 
-		self.info = {}
-
-		self.watch_pairs = []
+		self.info = {"last_connection_time": struct_time((2014, 5, 1, 0, 0, 0, 3, 127, 0))}
 
 		self.download_dir = "downloads/"
 		self.database_dir = "database/"
@@ -32,13 +31,21 @@ class DataBase(object):
 		self.info_file = join(self.info_dir, "info.json")
 		self.repo_id_file = join(self.database_dir, "repo_id.json")
 		self.user_id_file = join(self.database_dir, "user_id.json")
+		self.log_file = open("log.txt", "w")
 
 		self.archive = None
 		#archive info from info file
 		self.repo_id = None
 		#repositories id from repo_id file
 		self.user_id = None
-		#users id from user_id file
+
+	#users id from user_id file
+
+	def log(self, info):
+		"""Dump info in log file
+		:param info: information to dump
+		"""
+		self.log_file.write(info + '\n')
 
 	@staticmethod
 	def create_or_check_path(name):
@@ -47,6 +54,7 @@ class DataBase(object):
 		:return True if file or folder exists, else False
 		"""
 		from os import makedirs, path
+
 		if not path.exists(name):
 			if "." in name:
 				#it is a file
@@ -78,9 +86,9 @@ class DataBase(object):
 			try:
 				return self.archive[key]
 			except KeyError:
-				print "Broken database info file (missing key \"%s\")." % key
+				self.log("Broken database info file (missing key \"%s\")." % key)
 			except TypeError:
-				print "Broken database info file (not a dictionary)."
+				self.log("Broken database info file (not a dictionary).")
 
 		def get_ids(file_name):
 			#check json object
@@ -94,11 +102,11 @@ class DataBase(object):
 				try:
 					obj = load(open(file_name))
 				except ValueError:
-					print "Broken \"%s\" file (not a JSON object)." % file_name
+					self.log("Broken \"%s\" file (not a JSON object)." % file_name)
 					self.json_file_init(file_name, "{}")
 					obj = load(open(file_name))
 			else:
-				print "Missing \"%s\" file." % file_name
+				self.log("Missing \"%s\" file." % file_name)
 				self.json_file_init(file_name, "{}")
 				obj = load(open(file_name))
 			return obj
@@ -112,8 +120,6 @@ class DataBase(object):
 		from json import load
 		from time import struct_time
 
-		self.info["last_connection_time"] = struct_time((2014, 4, 25, 15, 0, 0, 4, 121, 0))
-
 		if self.create_or_check_path(self.info_file):
 			try:
 				self.archive = load(open(self.info_file))
@@ -122,10 +128,10 @@ class DataBase(object):
 					self.info["last_connection_time"] = struct_time(last_connection_time)
 
 			except ValueError:
-				print "Broken database info file (not a JSON object)."
+				self.log("Broken database info file (not a JSON object).")
 				self.json_file_init(self.info_file, "{}")
 		else:
-			print "Missing database info file."
+			self.log("Missing database info file.")
 			self.json_file_init(self.info_file, "{}")
 
 		self.repo_id = get_ids(self.repo_id_file)
@@ -170,11 +176,13 @@ class DataBase(object):
 				"""
 				return ("" if number > 9 else "0") + str(number)
 
-			return "%s-%s-%s-%s" % (structure.tm_year, join_number_to_zero(structure.tm_mon), join_number_to_zero(structure.tm_mday), structure.tm_hour)
+			return "%s-%s-%s-%s" % (
+				structure.tm_year, join_number_to_zero(structure.tm_mon), join_number_to_zero(structure.tm_mday),
+				structure.tm_hour)
 
 		current_time = self.get_time()
 		if current_time is None:
-			print "Can't get time."
+			self.log("Can't get time.")
 			return False
 
 		from time import mktime, gmtime, timezone
@@ -183,12 +191,11 @@ class DataBase(object):
 		#timezone difference in seconds between GMT and west coast of USA
 
 		for download_time in range(int(mktime(self.info["last_connection_time"])) + 3600 - timezone, current_time - 3600, 3600):
-			print gmtime(download_time + difference)
+			print "Debug Info: (download_time)", gmtime(download_time)
 			self.download_file(time_convert(gmtime(download_time + difference)))
 			self.info["last_connection_time"] = gmtime(download_time)
 
-	@staticmethod
-	def get_time():
+	def get_time(self):
 		"""
 		:return: (current time in seconds since the Epoch) or (None if it's impossible to get time)
 		"""
@@ -201,13 +208,13 @@ class DataBase(object):
 			current_time = int(response.tx_time)
 			return current_time
 		except ImportError:
-			print "ImportError: ntplib package not found."
+			self.log("ImportError: ntplib package not found.")
 		except gaierror:
-			print "socket.gaierror: host name invalid."
+			self.log("socket.gaierror: host name invalid.")
 		except timeout:
-			print "socket.timeout: no response."
+			self.log("socket.timeout: no response.")
 		except:
-			print "Unknown error."
+			self.log("Unknown error.")
 
 	@staticmethod
 	def get_id(storage, key):
@@ -227,15 +234,13 @@ class DataBase(object):
 		from os import listdir, remove
 		from os.path import join
 
-		self.watch_pairs = []
-
 		for json_file in listdir(self.new_data_dir):
 			text = open(join(self.new_data_dir, json_file))
 			for line in text:
 				event = loads(line)
 				if event["type"] == "WatchEvent":
 					event["url"] = event["url"][19:]
-					print event["actor"], event["url"]
+					print "Debug Info: (pair)", event["actor"], event["url"]
 					repo_id = self.get_id(self.repo_id, event["url"])
 					user_id = self.get_id(self.user_id, event["actor"])
 					self.create_or_check_path(join(self.database_dir, str(repo_id) + ".json"))
@@ -248,8 +253,6 @@ class DataBase(object):
 					user_list.append(user_id)
 					self.dump_object(user_list, join(self.database_dir, str(repo_id) + ".json"))
 					data_file.close()
-					#self.watch_pairs.append((repo_id, user_id))
-					#print self.watch_pairs[-1]
 			text.close()
 			remove(join(self.new_data_dir, json_file))
 
@@ -271,8 +274,7 @@ db.get_data_archives()
 db.watch_events()
 db.dump_object(db.repo_id, db.repo_id_file)
 db.dump_object(db.user_id, db.user_id_file)
-db.dump_object(db.watch_pairs, db.data_file)
-print db.info["last_connection_time"]
+print "Debug Info: (last_connection_time)", db.info["last_connection_time"]
 db.info["last_connection_time"] = db.info["last_connection_time"].__getslice__(0, 9)
 db.dump_object(db.info, db.info_file)
 
