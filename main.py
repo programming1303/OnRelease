@@ -176,7 +176,7 @@ class DataBase(object):
 			print "Can't get time."
 			return False
 
-		from time import mktime, gmtime
+		from time import mktime, gmtime, timezone
 
 		e = 0
 		# interval in seconds from new hour starting till appearance archive for the last hour
@@ -184,7 +184,7 @@ class DataBase(object):
 		difference = - 3600 * 8
 		#timezone difference in seconds between GMT and west coast of USA
 
-		for download_time in range(int(mktime(self.info["last_connection_time"])) + 3600, current_time - e - 3600, 3600):
+		for download_time in range(int(mktime(self.info["last_connection_time"])) + 3600 - timezone, current_time - e - 3600, 3600):
 			print gmtime(download_time), " + difference", difference
 			self.download_file(time_convert(gmtime(download_time + difference)))
 			self.info["last_connection_time"] = gmtime(download_time)
