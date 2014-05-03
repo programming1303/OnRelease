@@ -5,6 +5,7 @@ Contains DataBase class.
 """
 
 #let's work with time only in GMT
+#let's download archive in an hour it was published on GitHub server
 #let's save data in format repository:[subscriber1, subscriber2, etc.]
 #let's save repositories and users by id, so, we do need dictionary
 #let's save GitHub urls without "https://github.com/" [19:]
@@ -178,14 +179,11 @@ class DataBase(object):
 
 		from time import mktime, gmtime, timezone
 
-		e = 0
-		# interval in seconds from new hour starting till appearance archive for the last hour
-
 		difference = - 3600 * 8
 		#timezone difference in seconds between GMT and west coast of USA
 
-		for download_time in range(int(mktime(self.info["last_connection_time"])) + 3600 - timezone, current_time - e - 3600, 3600):
-			print gmtime(download_time), " + difference", difference
+		for download_time in range(int(mktime(self.info["last_connection_time"])) + 3600 - timezone, current_time - 3600, 3600):
+			print gmtime(download_time + difference)
 			self.download_file(time_convert(gmtime(download_time + difference)))
 			self.info["last_connection_time"] = gmtime(download_time)
 
