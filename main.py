@@ -281,8 +281,6 @@ class DataBase(object):
             repo_id = 100000000000
             self.log("RepoID Error")
 
-        user_id = self.get_id(self.user_id, event["actor"])
-
         try:
             repo_users = open(join(self.database_dir, str(repo_id) + ".json"))
             repo_users_list = load(repo_users)
@@ -292,7 +290,7 @@ class DataBase(object):
             self.log("ValueError while reading repo_users")
             repo_users_list = []
 
-        if user_id in repo_users_list:
+        for user_id in repo_users_list:
             self.create_or_check_path(join(self.pool_dir, str(user_id) + ".json"))
             pool_file = open(join(self.pool_dir, str(user_id) + ".json"), "r+w")
 
