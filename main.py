@@ -272,7 +272,7 @@ class DataBase(object):
         from json import loads, load
         from os.path import join
 
-        print "Debug Info -- Forming Pool: (pair)", event["actor"], event["url"][19:], event["created_at"]
+        print "Debug Info: Forming Pool: (pair)", event["actor"], event["url"][19:], event["created_at"]
 
         try:
             repo_id = event["repository"]["id"]
