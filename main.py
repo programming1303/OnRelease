@@ -272,14 +272,13 @@ class DataBase(object):
         from json import loads, load
         from os.path import join
 
-        event["url"] = event["url"][19:]
-        print "Debug Info -- Forming Pool: (pair)", event["actor"], event["url"], event["created_at"]
+        print "Debug Info -- Forming Pool: (pair)", event["actor"], event["url"][19:], event["created_at"]
 
         try:
             repo_id = event["repository"]["id"]
         except KeyError:
-            repo_id = 100000000000
             self.log("RepoID Error")
+            return
 
         try:
             repo_users = open(join(self.database_dir, str(repo_id) + ".json"))
