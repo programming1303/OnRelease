@@ -289,6 +289,7 @@ class DataBase(object):
         except IOError:
             repo_users_list = []
         except ValueError:
+            self.log("ValueError while reading repo_users")
             repo_users_list = []
 
         if user_id in repo_users_list:
