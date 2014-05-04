@@ -229,7 +229,7 @@ class DataBase(object):
             return len(storage) - 1
         return storage[key]
 
-    def watch_events(self):
+    def process_events(self):
         """Parse files in data folder and get Watch Events"""
         from json import loads, load
         from os import listdir, remove
@@ -319,7 +319,7 @@ class DataBase(object):
 db = DataBase()
 db.database_init()
 db.get_data_archives()
-db.watch_events()
+db.process_events()
 db.dump_object(db.repo_id, db.repo_id_file)
 db.dump_object(db.user_id, db.user_id_file)
 print "Debug Info: (last_connection_time)", db.info["last_connection_time"]
