@@ -25,6 +25,7 @@ class DataBase(object):
 
         self.download_dir = "downloads/"
         self.database_dir = "database/"
+        self.pool_dir = "pool/"
         self.new_data_dir = "data/"
         self.info_dir = "info/"
         self.data_file = join(self.database_dir, "pairs.json")
@@ -35,8 +36,6 @@ class DataBase(object):
 
         self.archive = None
         #archive info from info file
-        self.repo_id = None
-        #repositories id from repo_id file
         self.user_id = None
 
     #users id from user_id file
@@ -112,6 +111,7 @@ class DataBase(object):
             return obj
 
         self.create_or_check_path(self.download_dir)
+        self.create_or_check_path(self.pool_dir)
         self.create_or_check_path(self.database_dir)
         self.create_or_check_path(self.new_data_dir)
         self.create_or_check_path(self.info_dir)
@@ -241,6 +241,8 @@ class DataBase(object):
                 event = loads(line)
                 if event["type"] == "WatchEvent":
                     self.process_watch_event(event);
+                elif event["type"] == "ReleaseEvent":
+                    self.process_release_event(event);
             text.close()
             remove(join(self.new_data_dir, json_file))
 
@@ -264,6 +266,43 @@ class DataBase(object):
         self.dump_object(user_list, join(self.database_dir, str(repo_id) + ".json"))
         data_file.close()
 
+    def process_release_event(self, event):
+        """Make users pool"""
+
+        from json import loads, load
+        from os.path import join
+
+        event["url"] = event["url"][19:]
+        print "Debug Info -- Forming Pool: (pair)", event["actor"], event["url"], event["created_at"]
+
+        try:
+            repo_id = event["repository"]["id"]
+        except KeyError:
+            repo_id = 100000000000
+            self.log("RepoID Error")
+
+        user_id = self.get_id(self.user_id, event["actor"])
+
+        try:
+            repo_users = open(join(self.database_dir, str(repo_id) + ".json"))
+            repo_users_list = load(repo_users)
+        except IOError:
+            repo_users_list = []
+        except ValueError:
+            repo_users_list = []
+
+        if user_id in repo_users_list:
+            self.create_or_check_path(join(self.pool_dir, str(user_id) + ".json"))
+            pool_file = open(join(self.pool_dir, str(user_id) + ".json"), "r+w")
+
+            try:
+                repo_list = load(pool_file)
+            except ValueError:
+                repo_list = []
+
+            repo_list.append(repo_id)
+            self.dump_object(repo_list, join(self.pool_dir, str(user_id) + ".json"))
+            pool_file.close()
 
     @staticmethod
     def dump_object(storage, file_name):
