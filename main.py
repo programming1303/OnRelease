@@ -326,7 +326,6 @@ db.log("Running " + str(localtime()))
 db.database_init()
 db.get_data_archives()
 db.process_events()
-db.dump_object(db.repo_id, db.repo_id_file)
 db.dump_object(db.user_id, db.user_id_file)
 print "Debug Info: (last_connection_time)", db.info["last_connection_time"]
 db.info["last_connection_time"] = db.info["last_connection_time"].__getslice__(0, 9)
