@@ -26,9 +26,6 @@ downloader.get_data_archives()
 parser.process_events()
 db.dump_object(db.user_id, db.user_id_file)
 
-print "Debug Info: (last_connection_time)", db.info["last_connection_time"]
-
-db.info["last_connection_time"] = db.info["last_connection_time"].__getslice__(0, 9)
-db.dump_object(db.info, db.info_file)
+db.dump_object(db.info, db.info["last_connection_time"].__getslice__(0, 9))
 
 db.log("Finished", "\n")
