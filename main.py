@@ -29,24 +29,23 @@ class DataBase(object):
 		self.pool_dir = "pool/"
 		self.new_data_dir = "data/"
 		self.info_dir = "info/"
-		self.data_file = join(self.database_dir, "pairs.json")
 		self.info_file = join(self.info_dir, "info.json")
-		self.repo_id_file = join(self.database_dir, "repo_id.json")
 		self.user_id_file = join(self.database_dir, "user_id.json")
-		self.log_file = open("log.txt", "w")
+		self.log_file = "log.txt"
 
 		self.archive = None
 		#archive info from info file
 		self.user_id = None
-		self.repo_id = None
 
 	#users id from user_id file
 
-	def log(self, info):
+	def log(self, *args):
 		"""Dump info in log file
-		:param info: information to dump
+		:param args: information to dump
 		"""
-		self.log_file.write(info + '\n')
+		log_file = open(self.log_file, "a")
+		for info in args:
+			log_file.write(str(info) + '\n')
 
 	@staticmethod
 	def create_or_check_path(name):
@@ -86,10 +85,10 @@ class DataBase(object):
 			"""
 			try:
 				return self.archive[key]
-			except KeyError:
-				self.log("Broken database info file (missing key \"%s\")." % key)
-			except TypeError:
-				self.log("Broken database info file (not a dictionary).")
+			except KeyError as e:
+				self.log("Broken database info file (missing key %s)." % e)
+			except TypeError as e:
+				self.log("Broken database info file (not a dictionary).", e)
 
 		def get_ids(file_name):
 			#check json object
@@ -117,7 +116,6 @@ class DataBase(object):
 		self.create_or_check_path(self.database_dir)
 		self.create_or_check_path(self.new_data_dir)
 		self.create_or_check_path(self.info_dir)
-		self.create_or_check_path(self.data_file)
 
 		from json import load
 		from time import struct_time
@@ -137,7 +135,6 @@ class DataBase(object):
 			self.json_file_init(self.info_file, "{}")
 
 		self.user_id = get_ids(self.user_id_file)
-		self.repo_id = get_ids(self.repo_id_file)
 
 	def download_file(self, name):
 		"""Download file from GitHub archive.
@@ -210,12 +207,12 @@ class DataBase(object):
 			response = client.request('pool.ntp.org')
 			current_time = int(response.tx_time)
 			return current_time
-		except ImportError:
-			self.log("ImportError: ntplib package not found.")
-		except gaierror:
-			self.log("socket.gaierror: host name invalid.")
-		except timeout:
-			self.log("socket.timeout: no response.")
+		except ImportError as e:
+			self.log("ImportError: ntplib package not found.", e)
+		except gaierror as e:
+			self.log("socket.gaierror: host name invalid.", e)
+		except timeout as e:
+			self.log("socket.timeout: no response.", e)
 		except:
 			self.log("Unknown error.")
 
@@ -283,7 +280,7 @@ class DataBase(object):
 		try:
 			repo_id = event["repository"]["id"]
 		except KeyError:
-			self.log("RepoID Error")
+			self.log("KeyError: [\"repository\"][\"id\"] in ReleaseEvent.")
 			return
 
 		try:
@@ -297,7 +294,7 @@ class DataBase(object):
 
 		for user_id in repo_users_list:
 			self.create_or_check_path(join(self.pool_dir, str(user_id) + ".json"))
-			pool_file = open(join(self.pool_dir, str(user_id) + ".json"), "r+w")
+			pool_file = open(join(self.pool_dir, str(user_id) + ".json"))
 
 			try:
 				repo_list = load(pool_file)
@@ -305,8 +302,9 @@ class DataBase(object):
 				repo_list = []
 
 			repo_list.append(repo_id)
-			self.dump_object(repo_list, join(self.pool_dir, str(user_id) + ".json"))
 			pool_file.close()
+			self.dump_object(repo_list, join(self.pool_dir, str(user_id) + ".json"))
+
 
 	@staticmethod
 	def dump_object(storage, file_name):
@@ -321,6 +319,10 @@ class DataBase(object):
 
 
 db = DataBase()
+
+from time import localtime
+db.log("Running " + str(localtime()))
+
 db.database_init()
 db.get_data_archives()
 db.process_events()
@@ -330,50 +332,4 @@ print "Debug Info: (last_connection_time)", db.info["last_connection_time"]
 db.info["last_connection_time"] = db.info["last_connection_time"].__getslice__(0, 9)
 db.dump_object(db.info, db.info_file)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#QUEEN 4EVA
+db.log("Finished", "\n")
