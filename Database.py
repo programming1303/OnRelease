@@ -4,15 +4,17 @@ Database.py
 Contains Downloader class to download GitHub archives.
 """
 
+from os.path import join
+from os import makedirs, path
+from json import load
+from time import struct_time
+from json import dump
+
 
 class Database(object):
 	"""	Store of folders and files.	"""
 
 	def __init__(self):
-
-		from os.path import join
-		from time import struct_time
-
 		self.info = {"last_connection_time": struct_time((2014, 5, 5, 0, 0, 0, 0, 131, 0))}
 
 		self.download_dir = "downloaded_data/"
@@ -27,7 +29,8 @@ class Database(object):
 		self.archive = None
 		#archive info from info file
 		self.user_id = None
-		#users id from user_id file
+
+	#users id from user_id file
 
 	def log(self, *args):
 		"""Dump info in log file
@@ -43,7 +46,6 @@ class Database(object):
 		:param name: name of file or folder
 		:return True if file or folder exists, else False
 		"""
-		from os import makedirs, path
 
 		if not path.exists(name):
 			if "." in name:
@@ -107,9 +109,6 @@ class Database(object):
 		self.create_or_check_path(self.new_data_dir)
 		self.create_or_check_path(self.info_dir)
 
-		from json import load
-		from time import struct_time
-
 		if self.create_or_check_path(self.info_file):
 			try:
 				self.archive = load(open(self.info_file))
@@ -144,7 +143,6 @@ class Database(object):
 		:param storage: object
 		:param file_name: JSON file
 		"""
-		from json import dump
 
 		json_file = open(file_name, "w")
 		dump(storage, json_file)

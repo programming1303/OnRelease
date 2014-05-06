@@ -5,6 +5,8 @@ Contains WatchEvent class to create pair user-repo.
 """
 
 from Event import Event
+from json import load
+from os.path import join
 
 
 class WatchEvent(Event):
@@ -14,11 +16,9 @@ class WatchEvent(Event):
 		"""Add pair user-repo to database
 		:param event: GitHub event
 		"""
-		from json import load
-		from os.path import join
 
 		event["url"] = event["url"][19:]
-		print "Debug Info: (pair)", event["actor"], event["url"]
+		print "Debug Info: (watch)", event["actor"], event["url"]
 		repo_id = event["repository"]["id"]  # now id is GitHub repo id
 		user_id = self.database.get_id(self.database.user_id, event["actor"])
 		self.database.create_or_check_path(join(self.database.database_dir, str(repo_id) + ".json"))

@@ -5,6 +5,8 @@ Contains ReleaseEvent class to create users pull.
 """
 
 from Event import Event
+from json import load
+from os.path import join
 
 
 class ReleaseEvent(Event):
@@ -15,10 +17,7 @@ class ReleaseEvent(Event):
 		:param event: GitHub event
 		"""
 
-		from json import load
-		from os.path import join
-
-		print "Debug Info: Forming Pool: (pair)", event["actor"], event["url"][19:], event["created_at"]
+		print "Debug Info: (release)", event["actor"], event["url"][19:], event["created_at"]
 
 		try:
 			repo_id = event["repository"]["id"]

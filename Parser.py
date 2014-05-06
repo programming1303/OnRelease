@@ -4,6 +4,12 @@ Parser.py
 Contains Parser class to download GitHub archives.
 """
 
+from json import loads
+from os import listdir, remove
+from os.path import join
+from WatchEvent import WatchEvent
+from ReleaseEvent import ReleaseEvent
+
 
 class Parser(object):
 	""" Parser of JSON archives. """
@@ -13,11 +19,6 @@ class Parser(object):
 
 	def process_events(self):
 		"""Parse files in data folder and get Watch Events"""
-		from json import loads
-		from os import listdir, remove
-		from os.path import join
-		from WatchEvent import WatchEvent
-		from ReleaseEvent import ReleaseEvent
 
 		for json_file in listdir(self.database.new_data_dir):
 			text = open(join(self.database.new_data_dir, json_file))

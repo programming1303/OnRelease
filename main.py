@@ -13,12 +13,12 @@ Contains DataBase class.
 from Database import Database
 from Downloader import Downloader
 from Parser import Parser
+from time import localtime
 
 db = Database()
 downloader = Downloader(db)
 parser = Parser(db)
 
-from time import localtime
 db.log("Running " + str(localtime()))
 
 db.database_init()
