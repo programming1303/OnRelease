@@ -1,15 +1,13 @@
 # encoding: utf-8
 """
 Database.py
-Contains Downloader class to download GitHub archives.
+Contains Database class to control storage.
 """
 
 from os.path import join
 from os import makedirs, path
-from json import load
 from time import struct_time
-from json import dump
-
+from json import dump, load
 
 class Database(object):
 	"""	Store of folders and files.	"""

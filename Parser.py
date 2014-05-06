@@ -4,12 +4,12 @@ Parser.py
 Contains Parser class to download GitHub archives.
 """
 
-from json import loads
+#from json import loads
 from os import listdir, remove
 from os.path import join
+from yajl import yajl_parse
 from WatchEventParser import WatchEventParser
 from ReleaseEventParser import ReleaseEventParser
-
 
 class Parser(object):
 	""" Parser of JSON archives. """
