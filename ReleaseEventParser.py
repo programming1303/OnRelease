@@ -7,7 +7,7 @@ Contains ReleaseEvent class to create users pull.
 from json import load
 from os.path import join
 
-from Event import Event
+from EventProceeder import EventProceeder
 
 
 class ReleaseEventParser(Event):

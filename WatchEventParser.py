@@ -7,9 +7,9 @@ Contains WatchEvent class to create pair user-repo.
 from json import load
 from os.path import join
 
-from Event import Event
+from EventProceeder import EventProceeder
 
-
+#TODO: refactor code to make sure all event-connected methods are in event proceeder
 class WatchEventParser(Event):
 	""" Parsing WatchEvent. """
 

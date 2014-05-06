@@ -26,7 +26,6 @@ class Dispatcher:
         """Sends event to EventProceeder.
 		:param name: name of GitHub archive in format YYYY-MM-DD-h
 		"""
-        #TODO: make event proceeder
         self.data = self.event_proceeder.proceed_event(self.cur_event)
     def send_to_database(self):
         """Sends data to database."""
