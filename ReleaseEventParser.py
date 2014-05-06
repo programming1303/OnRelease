@@ -1,6 +1,6 @@
 # encoding: utf-8
 """
-ReleaseEvent.py
+ReleaseEventParser.py
 Contains ReleaseEvent class to create users pull.
 """
 
@@ -9,7 +9,7 @@ from json import load
 from os.path import join
 
 
-class ReleaseEvent(Event):
+class ReleaseEventParser(Event):
 	""" Parsing ReleaseEvent. """
 
 	def process(self, event):

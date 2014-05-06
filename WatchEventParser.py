@@ -9,7 +9,7 @@ from json import load
 from os.path import join
 
 
-class WatchEvent(Event):
+class WatchEventParser(Event):
 	""" Parsing WatchEvent. """
 
 	def process(self, event):
