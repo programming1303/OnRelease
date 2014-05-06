@@ -10,6 +10,7 @@ from os.path import join
 from os import remove
 from time import mktime, gmtime, timezone
 from socket import gaierror, timeout
+
 from ntplib import NTPClient
 
 
@@ -56,8 +57,8 @@ class Downloader(object):
 				return ("" if number > 9 else "0") + str(number)
 
 			return "%s-%s-%s-%s" % (
-			structure.tm_year, join_number_to_zero(structure.tm_mon), join_number_to_zero(structure.tm_mday),
-			structure.tm_hour)
+				structure.tm_year, join_number_to_zero(structure.tm_mon), join_number_to_zero(structure.tm_mday),
+				structure.tm_hour)
 
 		current_time = self.get_time()
 		if current_time is None:
@@ -73,7 +74,7 @@ class Downloader(object):
 			self.download_file(time_convert(gmtime(download_time + difference)))
 			self.database.info["last_connection_time"] = gmtime(download_time)
 
-		#TODO: last_connection info in downloader.config
+			#TODO: last_connection info in downloader.config
 
 	def get_time(self):
 		"""

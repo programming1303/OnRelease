@@ -4,9 +4,10 @@ WatchEvent.py
 Contains WatchEvent class to create pair user-repo.
 """
 
-from Event import Event
 from json import load
 from os.path import join
+
+from Event import Event
 
 
 class WatchEventParser(Event):
