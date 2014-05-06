@@ -7,6 +7,7 @@ Contains Parser class to download GitHub archives.
 from json import loads
 from os import listdir, remove
 from os.path import join
+
 from WatchEventParser import WatchEventParser
 from ReleaseEventParser import ReleaseEventParser
 

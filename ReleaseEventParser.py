@@ -4,9 +4,10 @@ ReleaseEventParser.py
 Contains ReleaseEvent class to create users pull.
 """
 
-from Event import Event
 from json import load
 from os.path import join
+
+from Event import Event
 
 
 class ReleaseEventParser(Event):
