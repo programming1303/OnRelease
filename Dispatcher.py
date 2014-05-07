@@ -31,12 +31,18 @@ class Dispatcher(object):
 
     def get_event_from_stream(self):
         """ Asks Parser for a new event. """
-        #TODO: make parser, think of how parser will tell us it need to download files
+        #TODO: make parser
         self.cur_event = self.parser.get_event()
 
     def process_event(self):
-        """ Sends event to EventProceeder. """
-        self.data = self.event_processor.proceed_event(self.cur_event)
+        #TODO: Review code and add proper docs
+        """ Sends event to EventProceeder or asks Downloader to download; and get new Event. """
+        if self.cur_event == None:
+            self.download()
+            self.get_event_from_stream()
+            self.process_event()
+
+        self.data = self.event_processor.process_event(self.cur_event)
 
     def send_to_database(self):
         """ Sends data to database."""
