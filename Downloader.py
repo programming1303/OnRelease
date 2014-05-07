@@ -8,91 +8,89 @@ from urllib import urlretrieve
 from gzip import open as gz_open
 from os.path import join
 from os import remove
-from time import mktime, gmtime, timezone
-from socket import gaierror, timeout
-
-from ntplib import NTPClient
+from time import time, gmtime
+from FileSystemWorker import create_or_check_path, json_file_load
 
 
 class Downloader(object):
-	"""	Methods of downloading and saving GitHub archives. """
+    """	Methods of downloading and saving GitHub archives. """
 
-	def __init__(self, database):
-		self.database = database
+    def __init__(self):
+        self.downloaded_data_dir = "downloaded_data/"
+        self.new_data_dir = "new_data/"
+        self.config_file = join("config/", "downloader.config")
 
-	def download_file(self, name):
-		"""Download file from GitHub archive.
-		:param name: name of GitHub archive in format YYYY-MM-DD-h
-		"""
+        create_or_check_path(self.downloaded_data_dir)
+        create_or_check_path(self.new_data_dir)
+        create_or_check_path(self.config_file)
 
-		archive_name = name + ".json.gz"
-		file_name = join(self.database.new_data_dir, name + ".json")
+        self.config = self.configuration()
 
-		urlretrieve("http://data.githubarchive.org/" + archive_name,
-		            filename=join(self.database.download_dir, archive_name))
-		archive = gz_open(join(self.database.download_dir, archive_name))
+    def configuration(self):
+        return json_file_load(self.config_file)
 
-		json_file = open(file_name, "w")
-		json_file.write(archive.read())
+    def download_file(self, name):
+        """Download file from GitHub archive.
+        :param name: name of GitHub archive in format YYYY-MM-DD-h
+        """
 
-		archive.close()
-		json_file.close()
+        archive_name = name + ".json.gz"
+        file_name = join(self.new_data_dir, name + ".json")
 
-		remove(join(self.database.download_dir, archive_name))
+        urlretrieve("http://data.githubarchive.org/" + archive_name,
+                    filename=join(self.downloaded_data_dir, archive_name))
+        archive = gz_open(join(self.downloaded_data_dir, archive_name))
 
-	def get_data_archives(self):
-		"""Get information from GitHub server."""
+        json_file = open(file_name, "w")
+        json_file.write(archive.read())
 
-		def time_convert(structure):
-			"""
-			:param structure: tuple representation of time
-			:return: GitHub archive time
-			"""
+        archive.close()
+        json_file.close()
 
-			def join_number_to_zero(number):
-				"""
-				:param number: positive int number
-				:return: adding number to 0 digit [9 -> 09, etc.]
-				"""
-				return ("" if number > 9 else "0") + str(number)
+        remove(join(self.downloaded_data_dir, archive_name))
 
-			return "%s-%s-%s-%s" % (
-				structure.tm_year, join_number_to_zero(structure.tm_mon), join_number_to_zero(structure.tm_mday),
-				structure.tm_hour)
+    def download_archive(self):
+        """Get information from GitHub server."""
 
-		current_time = self.get_time()
-		if current_time is None:
-			self.database.log("Can't get time.")
-			return False
+        def time_convert(structure):
+            """
+            :param structure: tuple representation of time
+            :return: GitHub archive time
+            """
 
-		difference = - 28800  # - 3600 * 8 => - 28800
-		#timezone difference in seconds between GMT and west coast of USA
+            def join_number_to_zero(number):
+                """
+                :param number: positive int number
+                :return: adding number to 0 digit [9 -> 09, etc.]
+                """
+                return ("" if number > 9 else "0") + str(number)
 
-		for download_time in range(int(mktime(self.database.info["last_connection_time"])) + 3600 - timezone,
-		                           current_time - 3600, 3600):
-			print "Debug Info: (download_time)", gmtime(download_time)
-			self.download_file(time_convert(gmtime(download_time + difference)))
-			self.database.info["last_connection_time"] = gmtime(download_time)
+            return "%s-%s-%s-%s" % (
+                structure.tm_year, join_number_to_zero(structure.tm_mon), join_number_to_zero(structure.tm_mday),
+                structure.tm_hour)
 
-			#TODO: last_connection info in downloader.config
+        current_time = self.get_time()
+        print gmtime(current_time)
 
-	def get_time(self):
-		"""
-		:return: (current time in seconds since the Epoch) or (None if it's impossible to get time)
-		"""
+        if current_time is None:
+            self.database.log("Can't get time.")
+            return None
 
-		try:
-			client = NTPClient()
-			response = client.request('pool.ntp.org')
-			current_time = int(response.tx_time)
-			return current_time
-		except ImportError as e:
-			self.database.log("ImportError: ntplib package not found.", e)
-		except gaierror as e:
-			self.database.log("socket.gaierror: host name invalid.", e)
-		except timeout as e:
-			self.database.log("socket.timeout: no response.", e)
-		except:
-			self.database.log("Unknown error.")
+        difference = - 28800  # - 3600 * 8 => - 28800
+        #timezone difference in seconds between GMT and west coast of USA
+
+        for download_time in range(int(mktime(self.database.info["last_connection_time"])) + 3600 - timezone,
+                                   current_time - 3600, 3600):
+            print "Debug Info: (download_time)", gmtime(download_time)
+            self.download_file(time_convert(gmtime(download_time + difference)))
+            self.database.info["last_connection_time"] = gmtime(download_time)
+
+    @staticmethod
+    def get_time():
+        """
+        :return: current time in seconds since the Epoch
+        """
+
+        return time()
 
 

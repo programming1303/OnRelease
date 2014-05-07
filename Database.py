@@ -5,7 +5,6 @@ Contains Database class to control storage.
 """
 
 from os.path import join
-from os import makedirs, path
 from time import struct_time
 from json import dump, load
 
@@ -28,54 +27,16 @@ class Database(object):
         self.archive = None
         #archive info from info file
         self.user_id = None
-
-    #users id from user_id file
-
-    def log(self, *args):
-        #TODO: delete logging from DataBase
-
-        """Dump info in log file
-		:param args: information to dump
-		"""
-        log_file = open(self.log_file, "a")
-        for info in args:
-            log_file.write(str(info) + '\n')
-
-    @staticmethod
-    def create_or_check_path(name):
-        """Create file or folder if it doesn't exist, else ignore.
-		:param name: name of file or folder
-		:return True if file or folder exists, else False
-		"""
-
-        if not path.exists(name):
-            if "." in name:
-                #it is a file
-                open(name, "w").close()
-            else:
-                #it is a folder
-                makedirs(name)
-            return False
-        return True
-
-    @staticmethod
-    def json_file_init(name, to_write):
-        """Initialize file in JSON format
-		:param name: name of file
-		:param to_write: string to write in file
-		"""
-        json_file = open(name, "w")
-        json_file.write(to_write)
-        json_file.close()
+        #users id from user_id file
 
     def database_init(self):
         """Initialize database (create files, folders)."""
 
         def get_stored_info(key):
             """
-			:param key: name of key of dictionary in stored database info file
-			:return: value by key, None if error occurs
-			"""
+            :param key: name of key of dictionary in stored database info file
+            :return: value by key, None if error occurs
+            """
             try:
                 return self.archive[key]
             except KeyError as e:
@@ -88,9 +49,9 @@ class Database(object):
             # if not check: init
             # return load
             """Get id dictionary from file with catching errors
-			:param file_name: JSON file with id list
-			:return: loaded JSON object from file or "[]" if error occurs
-			"""
+            :param file_name: JSON file with id list
+            :return: loaded JSON object from file or "[]" if error occurs
+            """
             if self.create_or_check_path(file_name):
                 try:
                     obj = load(open(file_name))
@@ -129,10 +90,10 @@ class Database(object):
     @staticmethod
     def get_id(storage, key):
         """Get or set id for key in storage
-		:param storage: dictionary
-		:param key: string
-		:return: id of key
-		"""
+        :param storage: dictionary
+        :param key: string
+        :return: id of key
+        """
         if not key in storage:
             storage[key] = len(storage)
             return len(storage) - 1
@@ -141,17 +102,17 @@ class Database(object):
     @staticmethod
     def dump_object(storage, file_name):
         """Dump storage in file
-		:param storage: object
-		:param file_name: JSON file
-		"""
+        :param storage: object
+        :param file_name: JSON file
+        """
 
         json_file = open(file_name, "w")
         dump(storage, json_file)
 
     def send_data(self, data):
         """Accepts file and puts it into a database
-		:param data: DBData
-		"""
+        :param data: DBData
+        """
 
         return True  #returns True if all is ok, False otherwise
 

@@ -17,8 +17,8 @@ from ReleaseEventParser import ReleaseEventParser
 class Parser(object):
     """ Parser of JSON archives. """
 
-    def __init__(self, database):
-        self.database = database
+    def __init__(self):
+        self.database = None
 
     def process_events(self):
         """Parse files in data folder and get Watch Events"""
