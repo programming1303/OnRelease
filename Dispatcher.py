@@ -19,10 +19,9 @@ class Dispatcher(object):
 
     def get_event_from_stream(self):
         """Asks Parser for a new event.
-		:param name: name of GitHub archive in format YYYY-MM-DD-h
 		"""
         #TODO: make parser, think of how parser will tell us it need to download files
-        self.cur_event = self.parser.get_event
+        self.cur_event = self.parser.get_event()
 
     def process_event(self):
         """Sends event to EventProceeder.
