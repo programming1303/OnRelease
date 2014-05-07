@@ -32,6 +32,8 @@ class Database(object):
     #users id from user_id file
 
     def log(self, *args):
+        #TODO: delete logging from DataBase
+
         """Dump info in log file
 		:param args: information to dump
 		"""
@@ -146,8 +148,16 @@ class Database(object):
         json_file = open(file_name, "w")
         dump(storage, json_file)
 
+    def send_data(self, data):
+        """Accepts file and puts it into a database
+		:param data: DBData
+		"""
+
+        return True  #returns True if all is ok, False otherwise
+
 
 class DBData:
     """Store data in good for DB format"""
+
     def __init__(self, datatype):
         self.datatype = datatype

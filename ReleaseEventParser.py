@@ -3,11 +3,12 @@
 ReleaseEventParser.py
 Contains ReleaseEvent class to create users pull.
 """
+#TODO: delete file and move all code to EventProcessor.py
 
 from json import load
 from os.path import join
 
-from EventProceeder import EventProceeder
+from EventProcessor import EventProcessor
 
 
 class ReleaseEventParser(Event):

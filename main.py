@@ -3,6 +3,7 @@
 Main file of the project.
 Contains DataBase class.
 """
+#TODO: connect the file with others
 
 #let's work with time only in GMT
 #let's download archive in an hour it was published on GitHub server
