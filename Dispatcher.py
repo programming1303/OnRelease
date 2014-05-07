@@ -7,6 +7,7 @@
 from Downloader import Downloader
 from FileSystemWorker import create_or_check_path
 
+#TODO: Let's make sure our process has a limit (will be finished). I think, it should be invoked by downloader -- when it can't get new data to parse
 
 class Dispatcher(object):
     """ Dispatcher class to control process of working. """
@@ -15,7 +16,7 @@ class Dispatcher(object):
         create_or_check_path("config/")
 
         #self.database = Database()
-        #self.parser = Parser()
+        #self.parser = Parser(downloaded_file_name)
         #self.event_processor = EventProcessor()
         self.downloader = Downloader()
 
