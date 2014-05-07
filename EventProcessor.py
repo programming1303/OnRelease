@@ -1,10 +1,10 @@
 # encoding: utf-8
 """
-EventProcessor.py
 Contains EventProceeder class and common methods.
 """
 
 from Database import DBData
+
 
 class EventProcessor(object):
     """ Basic event handling, from which all others are inherited.
@@ -22,14 +22,17 @@ class EventProcessor(object):
         type = None
         return type
 
-class WatchEventProcessor(EventProceeder):
+
+class WatchEventProcessor(EventProcessorr):
     """ Watch event handling. """
+
     def process_event(self):
 
-        #TODO: develop watch event processor
+    #TODO: develop watch event processor
 
-class ReleaseEventProcessor(EventProceeder):
-    """ Release event handling. """
+class ReleaseEventProcessor(EventProcessor):
+        """ Release event handling. """
+
     def process_event(self):
 
         #TODO: develop release event processor
