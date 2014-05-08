@@ -29,37 +29,41 @@ class Dispatcher(object):
         """ Process of downloading, parsing and saving information. """
         download_status = True
         while download_status:
-            event = self.parser.get_event()
+            event = self.get_event()
             if event is None:
                 download_status = self.download()
             else:
-                self.event_processor.process_event(event)
+                data = self.process_event(event)
+                if data is not None:
+                    self.send_to_database(data)
 
-
-    def get_event_from_stream(self):
-        """ Asks Parser for a new event. """
-        #TODO: make parser
-        self.cur_event = self.parser.get_event()
-
-    def process_event(self):
-        #TODO: Review code and add proper docs
-        """ Sends event to EventProceeder or asks Downloader to download; and get new Event. """
-        if self.cur_event is None:
-            self.download()
-            self.get_event_from_stream()
-            self.process_event()
-
-        self.data = self.event_processor.process_event(self.cur_event)
-
-    def send_to_database(self):
-        """ Sends data to database."""
-        #TODO: make connections with database
-        self.database.send_data(self.data)
+    def get_event(self):
+        """ Asks Parser for a new event.
+        :return: event object if getting event has been successful else None
+        """
+        #TODO: parser interface
+        return None
 
     def download(self):
         """ Sends a request to Downloader.
         :return: False if downloading failed else True
         """
-        #TODO: make downloader interface
         self.new_data = self.downloader.download_archive()
         return False if self.new_data is None else True
+
+    def process_event(self, event):
+        """ Sends event to EventProcessor
+        :param event: GitHub event object
+        """
+        #data = self.event_processor.process_event(event)
+        #TODO: EventProcessor interface
+        return None
+
+    def send_to_database(self, data):
+        """ Sends data to database.
+        :param data: data in DB format.
+        """
+        #TODO: choose data format
+        #TODO: DataBase processor
+        #self.database.send_data(self.data)
+

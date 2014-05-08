@@ -29,7 +29,7 @@ class Downloader(object):
         :return: configuration from config file if invoking was successful else default configuration
         """
         config = json_file_load(self.config_file)
-        default = {"last_connection_time": struct_time((2014, 5, 8, 0, 0, 0, 3, 134, 0))}
+        default = {"last_connection_time": struct_time((2014, 5, 8, 15, 0, 0, 3, 134, 0))}
         return config if config is not None else default
 
     def download_file(self, name):
@@ -78,21 +78,22 @@ class Downloader(object):
                 structure.tm_hour)
 
         logger = getLogger('LOGGER')
-
+        #TODO: fix serious bug with timezones
         current_time = self.get_time()
         logger.debug("current time: " + str(gmtime(current_time)))
 
         difference = -28800
         #timezone difference in seconds between GMT and west coast of USA
 
-        downloading_time = int(mktime(self.config["last_connection_time"])) + 3600 - timezone + difference
+        downloading_time = int(mktime(self.config["last_connection_time"])) + 3600 + difference
+        print gmtime(downloading_time)
+        downloading_time += difference
         logger.debug("downloading time: " + str(gmtime(downloading_time)))
 
-        if downloading_time - 7200 < current_time:
+        if downloading_time > current_time - 7200:
             logger.info("not able to download file.")
             return
 
-        logger.debug("downloading time: " + str(gmtime(downloading_time)))
         json_file_name = self.download_file(time_convert(gmtime(downloading_time)))
         self.config["last_connection_time"] = gmtime(downloading_time)
         return json_file_name
