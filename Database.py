@@ -13,7 +13,7 @@ class Database(object):
     """	Store of folders and files.	"""
 
     def __init__(self):
-        self.info = {"last_connection_time": struct_time((2014, 5, 5, 0, 0, 0, 0, 131, 0))}
+        self.info = None
 
         self.download_dir = "downloaded_data/"
         self.database_dir = "database/"

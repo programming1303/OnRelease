@@ -6,6 +6,7 @@
 #from EventProcessor import EventProcessor
 from Downloader import Downloader
 from FileSystemWorker import create_or_check_path
+from logging.config import fileConfig
 
 
 class Dispatcher(object):
@@ -13,6 +14,9 @@ class Dispatcher(object):
 
     def __init__(self):
         create_or_check_path("config/")
+        create_or_check_path("logs/")
+
+        fileConfig('config/logger.conf')
 
         #self.database = Database()
         #self.parser = Parser()
@@ -24,7 +28,7 @@ class Dispatcher(object):
     def processor(self):
         """ Process of downloading, parsing and saving information. """
         if True:  # self.parser.is_stream_empty():
-            if self.download() is None:
+            if not self.download():
                 return
             self.parser.get_event(self.new_data)
 
@@ -45,10 +49,10 @@ class Dispatcher(object):
 
     def download(self):
         """ Sends a request to Downloader.
-        :return: None if downloading failed else True
+        :return: False if downloading failed else True
         """
         #TODO: make downloader interface
         self.new_data = self.downloader.download_archive()
-        return None if self.new_data is None else True
+        return False if self.new_data is None else True
 
 
