@@ -4,35 +4,65 @@ Parser.py
 Contains Parser class to download GitHub archives.
 """
 
-from json import loads
-from os import listdir, remove
-from os.path import join
 
-from WatchEventParser import WatchEventParser
-from ReleaseEventParser import ReleaseEventParser
+from yajl import *
+from collections import deque
 
-#TODO: make parser
-#TODO: make parser to tell dispatcher if the stream is ended
+
+#TODO: make parser using yajl
 
 class Parser(object):
     """ Parser of JSON archives. """
 
+    def __init__(self, json_file):
+        self.json_file = json_file
+        self.handler = ContentHandler()
+        self.line = deque() #popleft(), append()
+
+    def get_event(self):
+        """Returns event from line. If returns None => needs to download new files"""
+        if self.line:
+            event = self.line.popleft()
+            return event
+        else:
+            return None
+
+class ContentHandler(YajlContentHandler):
     def __init__(self):
-        self.database = None
+        self.bracket_stack = deque() #append(), pop()
+        self.event = None
+        self.cur_field = None
 
-    def process_events(self):
-        """Parse files in data folder and get Watch Events"""
+    def parse_start(self):
+        self.event = {}
 
-        for json_file in listdir(self.database.new_data_dir):
-            text = open(join(self.database.new_data_dir, json_file))
-            for line in text:
-                event = loads(line)
-                if event["type"] == "WatchEvent":
-                    WatchEventParser(self.database).process(event)
-                elif event["type"] == "ReleaseEvent":
-                    ReleaseEventParser(self.database).process(event)
-            text.close()
-            remove(join(self.database.new_data_dir, json_file))
+    def yajl_null(self, ctx): #can be a dict data
+        self.out.write("null\n" )
 
-    def is_stream_empty(self):
-        """Tells if the stream is empty and we do need to download new files"""
+    def yajl_boolean(self, ctx, boolVal): #can be a dic data
+        self.out.write("bool: %s\n" %('true' if boolVal else 'false'))
+
+    def yajl_number(self, ctx, stringNum): #can be a dict data
+        #TODO: develop...
+        num = float(stringNum) if '.' in stringNum else int(stringNum)
+        self.out.write("number: %s\n" %num)
+
+    def yajl_string(self, ctx, stringVal):
+        #TODO: develop...
+        self.out.write("string: '%s'\n" %stringVal)
+
+    def yajl_start_map(self, ctx):
+        self.bracket_stack.append('{')
+
+    def yajl_map_key(self, ctx, stringVal):
+        self.cur_field = stringVal
+
+    def yajl_end_map(self, ctx):
+        self.bracket_stack.pop()
+        self.cur_field = None
+
+    def yajl_start_array(self, ctx):
+        self.bracket_stack.append('[')
+
+    def yajl_end_array(self, ctx):
+        self.bracket_stack.pop()
