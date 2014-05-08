@@ -9,7 +9,6 @@ from time import time, gmtime, mktime, timezone, struct_time
 from FileSystemWorker import create_or_check_path, json_file_load
 from logging import getLogger
 
-#TODO: Let's make sure downloader returns None if it has no data to download
 
 class Downloader(object):
     """	Methods of downloading and saving GitHub archives. """
