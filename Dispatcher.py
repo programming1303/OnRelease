@@ -8,7 +8,6 @@ from Downloader import Downloader
 from FileSystemWorker import create_or_check_path
 from logging.config import fileConfig
 
-#TODO: Let's make sure our process has a limit (will be finished). I think, it should be invoked by downloader -- when it can't get new data to parse
 
 class Dispatcher(object):
     """ Dispatcher class to control process of working. """
@@ -28,10 +27,13 @@ class Dispatcher(object):
 
     def processor(self):
         """ Process of downloading, parsing and saving information. """
-        if True:  # self.parser.is_stream_empty():
-            if not self.download():
-                return
-            self.parser.get_event(self.new_data)
+        download_status = True
+        while download_status:
+            event = self.parser.get_event()
+            if event is None:
+                download_status = self.download()
+            else:
+                self.event_processor.process_event(event)
 
 
     def get_event_from_stream(self):
@@ -42,7 +44,7 @@ class Dispatcher(object):
     def process_event(self):
         #TODO: Review code and add proper docs
         """ Sends event to EventProceeder or asks Downloader to download; and get new Event. """
-        if self.cur_event == None:
+        if self.cur_event is None:
             self.download()
             self.get_event_from_stream()
             self.process_event()
@@ -61,5 +63,3 @@ class Dispatcher(object):
         #TODO: make downloader interface
         self.new_data = self.downloader.download_archive()
         return False if self.new_data is None else True
-
-

@@ -28,6 +28,7 @@ def json_file_init(name, to_write):
     :param name: name of file
     :param to_write: string to write in file
     """
+
     json_file = open(name, "w")
     json_file.write(to_write)
     json_file.close()
@@ -38,6 +39,7 @@ def json_file_load(name):
     :param name: name of file
     :return: Python object
     """
+
     logger = getLogger('LOGGER')
     try:
         json_file = open(name)
@@ -46,5 +48,3 @@ def json_file_load(name):
         logger.warning(__name__ + ": " + "no file %s" % name)
     except ValueError:
         logger.warning(__name__ + ": " + "not a JSON file %s" % name)
-
-
