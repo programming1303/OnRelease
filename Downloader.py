@@ -115,5 +115,3 @@ class Downloader(object):
         """
 
         return int(time())
-
-
