@@ -32,7 +32,7 @@ class Downloader(object):
         """
         config = json_file_load(self.config_file)
         default = {"last_connection_time": struct_time((2014, 5, 9, 12, 0, 0, 3, 134, 0))}
-        return config if config is not None else default
+        return config or default
 
     def download_file(self, name):
         """Download file from GitHub archive.
