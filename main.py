@@ -13,4 +13,5 @@ Contains DataBase class.
 
 from Dispatcher import Dispatcher
 
-Dispatcher().processor()
+if __name__ == "__main__":
+    Dispatcher().processor()
