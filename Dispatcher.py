@@ -2,9 +2,9 @@
 """ Dispatcher.py """
 
 #from Database import Database
-#from EventProcessor import EventProcessor
 from logging.config import fileConfig
 
+from EventProcessor import EventProcessor
 from Parser import Parser
 from Downloader import Downloader
 from FileSystemWorker import create_or_check_path
@@ -21,11 +21,12 @@ class Dispatcher(object):
 
         #self.database = Database()
         self.parser = Parser()
-        #self.event_processor = EventProcessor()
+        self.event_processor = EventProcessor()
         self.downloader = Downloader()
 
-        self.new_data_file = None
+        self.new_events_file = None
         self.new_data = None
+        self.new_event = None
 
     def processor(self):
         """ Process of downloading, parsing and saving information. """
@@ -33,37 +34,34 @@ class Dispatcher(object):
         while download_status:
             getting_event_status = self.get_event()
             if getting_event_status:
-                pass
-                #if data is not None:
-                #self.send_to_database(data)
-                #data = self.process_event(None)
+                processing_event_status = self.process_event()
             else:
                 download_status = self.download()
 
     def get_event(self):
         """ Asks Parser for a new event.
-        :return: event object if getting event has been successful else None
+        :return: False if getting event failed else True
         """
-        self.new_data = self.parser.get_event(self.new_data_file)
-        return False if self.new_data is None else True
+        self.new_event = self.parser.get_event(self.new_events_file)
+        return False if self.new_event is None else True
 
     def download(self):
         """ Sends a request to Downloader.
         :return: False if downloading failed else True
         """
-        self.new_data_file = self.downloader.download_archive()
-        return False if self.new_data_file is None else True
+        self.new_events_file = self.downloader.download_archive()
+        return False if self.new_events_file is None else True
 
-    @staticmethod
-    def process_event():
-        """ Sends event to EventProcessor """
-        #data = self.event_processor.process_event(event)
-        #TODO: EventProcessor interface
-        return None
+    def process_event(self):
+        """ Asks EventProcessor to get data from event.
+        :return: False if processing event failed else True
+        """
+        self.new_data = self.event_processor.process_event(self.new_event)
+        return False if self.new_data is None else True
 
     @staticmethod
     def send_to_database(data):
-        """ Sends data to database.
+        """ Sends data to Database.
         :param data: data in DB format.
         """
         #TODO: choose data format

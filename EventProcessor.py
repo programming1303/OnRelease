@@ -3,45 +3,57 @@
 Contains EventProcessor class and common methods.
 """
 
+from logging import getLogger
+
 
 class EventProcessor(object):
-    """ Basic event handling, from which all others are inherited.
-    """
+    """ Basic event processor, from which all others are inherited. """
 
     def __init__(self):
-        """
-        :param event: GitHubEvent
-        """
         self.event = None
-        #TODO: write processor
+        self.parsers = {}
+        self.parsers_appending()
+        self.logger = getLogger('LOGGER')
 
-    @staticmethod
-    def event_type():
-        #TODO: write type
+    def parsers_appending(self):
+        """ Creating dictionary [event_type: parser]"""
+        self.parsers["WatchEvent"] = WatchEventProcessor()
+        self.parsers["ReleaseEvent"] = ReleaseEventProcessor()
+
+    def get_type_of_event(self):
         """
-
-
-        :return:
+        :return: type of GitHub event if getting event was successful else "UnknownType"
         """
-        event_type = None
-        return event_type
+        try:
+            return self.event["type"]
+        except ValueError:
+            self.logger.warning(__name__ + ": " + "Missing type in event %s" % self.event)
+            return "UnknownEvent"
 
-
-class WatchEventProcessor(EventProcessor):
-    """ Watch event handling. """
-
-    def process_event(self):
+    def process_event(self, event):
+        """ Redirects processing of GitHub event to special processor
+        :param event: GitHub event
+        :return: data if processing was successful else None
         """
+        self.event = event
+        event_type = self.get_type_of_event()
+        if event_type in self.parsers.keys():
+            return self.parsers[event_type].get_data_from_event(event)
+        else:
+            self.logger.error(__name__ + ": " + "Unknown event type %s" % event_type)
 
 
-        """
+class WatchEventProcessor(object):
+    """ Watch event processor. """
+
+    def get_data_from_event(self, event):
+        #TODO: copy watch event processor from file
         pass
-        #TODO: develop watch event processor
 
 
-class ReleaseEventProcessor(EventProcessor):
-    """ Release event handling. """
+class ReleaseEventProcessor(object):
+    """ Release event processor. """
 
-    def process_event(self):
+    def get_data_from_event(self, event):
+        #TODO: copy release event processor from file
         pass
-        #TODO: develop release event processor

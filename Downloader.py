@@ -7,8 +7,9 @@ from os.path import join
 from os import remove
 from time import time, gmtime, struct_time
 from calendar import timegm
-from FileSystemWorker import create_or_check_path, json_file_load
 from logging import getLogger
+
+from FileSystemWorker import create_or_check_path, json_file_load
 
 
 class Downloader(object):
@@ -37,7 +38,7 @@ class Downloader(object):
     def download_file(self, name):
         """Download file from GitHub archive.
         :param name: name of GitHub archive in format YYYY-MM-DD-h
-        :return: name of JSON file with data
+        :return: name of JSON file with data if downloading was successful else None
         """
         #TODO: handle exceptions
         archive_name = name + ".json.gz"
@@ -47,12 +48,12 @@ class Downloader(object):
             urlretrieve("http://data.githubarchive.org/" + archive_name,
                         filename=join(self.downloaded_data_dir, archive_name))
         except IOError:
-            self.logger.error("unable to download file (error creating connection).")
+            self.logger.error(__name__ + ": " + "unable to download file (error creating connection).")
 
         try:
             archive = gz_open(join(self.downloaded_data_dir, archive_name))
         except IOError:
-            self.logger.error("unable to open gzipped file (file not created).")
+            self.logger.error(__name__ + ": " + "unable to open gzipped file (file not created).")
         else:
             json_file = open(file_name, "w")
             json_file.write(archive.read())
@@ -87,16 +88,16 @@ class Downloader(object):
                 structure.tm_hour)
 
         current_time = self.get_time()
-        self.logger.debug("current time: " + str(gmtime(current_time)))
+        self.logger.debug(__name__ + ": " + "current time: " + str(gmtime(current_time)))
 
         difference = -25200
         #timezone difference in seconds between GMT and west coast of USA
 
         downloading_time = int(timegm(self.config["last_connection_time"])) + 3600
-        self.logger.debug("downloading time: " + str(gmtime(downloading_time)))
+        self.logger.debug(__name__ + ": " + "downloading time: " + str(gmtime(downloading_time)))
 
         if downloading_time > current_time - 7200:
-            self.logger.info("unable to download file (time limiting).")
+            self.logger.info(__name__ + ": " + "unable to download file (time limiting).")
             return
 
         downloading_time += difference
@@ -104,7 +105,7 @@ class Downloader(object):
         json_file_name = self.download_file(time_convert(gmtime(downloading_time)))
 
         self.config["last_connection_time"] = gmtime(downloading_time - difference)
-        self.logger.debug("last_connection_time: " + str(self.config["last_connection_time"]))
+        self.logger.debug(__name__ + ": " + "last_connection_time: " + str(self.config["last_connection_time"]))
 
         return json_file_name
 
