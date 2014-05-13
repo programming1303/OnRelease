@@ -2,11 +2,12 @@
 """ Dispatcher.py """
 
 #from Database import Database
-#from Parser import Parser
 #from EventProcessor import EventProcessor
+from logging.config import fileConfig
+
+from Parser import Parser
 from Downloader import Downloader
 from FileSystemWorker import create_or_check_path
-from logging.config import fileConfig
 
 
 class Dispatcher(object):
@@ -19,47 +20,49 @@ class Dispatcher(object):
         fileConfig('config/logger.conf')
 
         #self.database = Database()
-        #self.parser = Parser(downloaded_file_name)
+        self.parser = Parser()
         #self.event_processor = EventProcessor()
         self.downloader = Downloader()
 
+        self.new_data_file = None
         self.new_data = None
 
     def processor(self):
         """ Process of downloading, parsing and saving information. """
         download_status = True
         while download_status:
-            event = self.get_event()
-            if event is None:
-                download_status = self.download()
+            getting_event_status = self.get_event()
+            if getting_event_status:
+                pass
+                #if data is not None:
+                #self.send_to_database(data)
+                #data = self.process_event(None)
             else:
-                data = self.process_event(event)
-                if data is not None:
-                    self.send_to_database(data)
+                download_status = self.download()
 
     def get_event(self):
         """ Asks Parser for a new event.
         :return: event object if getting event has been successful else None
         """
-        #TODO: parser interface
-        return None
+        self.new_data = self.parser.get_event(self.new_data_file)
+        return False if self.new_data is None else True
 
     def download(self):
         """ Sends a request to Downloader.
         :return: False if downloading failed else True
         """
-        self.new_data = self.downloader.download_archive()
-        return False if self.new_data is None else True
+        self.new_data_file = self.downloader.download_archive()
+        return False if self.new_data_file is None else True
 
-    def process_event(self, event):
-        """ Sends event to EventProcessor
-        :param event: GitHub event object
-        """
+    @staticmethod
+    def process_event():
+        """ Sends event to EventProcessor """
         #data = self.event_processor.process_event(event)
         #TODO: EventProcessor interface
         return None
 
-    def send_to_database(self, data):
+    @staticmethod
+    def send_to_database(data):
         """ Sends data to database.
         :param data: data in DB format.
         """

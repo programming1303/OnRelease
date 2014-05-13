@@ -2,7 +2,7 @@
 """ FileSystemWorker.py """
 
 from os import makedirs, path
-from json import load
+from json import load, loads
 from logging import getLogger
 
 
@@ -36,15 +36,39 @@ def json_file_init(name, to_write):
 
 def json_file_load(name):
     """Loads JSON object from file
-    :param name: name of file
+    :param name: name of JSON file
     :return: Python object
     """
 
     logger = getLogger('LOGGER')
+    json_file = file_open(name)
+    if json_file is None:
+        return None
     try:
-        json_file = open(name)
         return load(json_file)
-    except IOError:
-        logger.warning(__name__ + ": " + "no file %s" % name)
     except ValueError:
         logger.warning(__name__ + ": " + "not a JSON file %s" % name)
+
+
+def json_string_load(string):
+    """Loads JSON object from string
+    :param string: JSON string
+    :return: Python object
+    """
+    logger = getLogger('LOGGER')
+    try:
+        return loads(string)
+    except ValueError:
+        logger.warning(__name__ + ": " + "not a JSON string %s" % string)
+
+
+def file_open(name):
+    """Opens a file
+    :param name: name of file
+    :return: file descriptor
+    """
+    logger = getLogger('LOGGER')
+    try:
+        return open(name)
+    except IOError:
+        logger.warning(__name__ + ": " + "no file %s" % name)

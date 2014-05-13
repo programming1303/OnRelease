@@ -1,6 +1,6 @@
 # encoding: utf-8
 """
-Contains EventProceeder class and common methods.
+Contains EventProcessor class and common methods.
 """
 
 
@@ -15,18 +15,28 @@ class EventProcessor(object):
         self.event = None
         #TODO: write processor
 
-    def event_type(self):
-        #TODO: write typee
-        type = None
-        return type
+    @staticmethod
+    def event_type():
+        #TODO: write type
+        """
+
+
+        :return:
+        """
+        event_type = None
+        return event_type
 
 
 class WatchEventProcessor(EventProcessor):
     """ Watch event handling. """
 
     def process_event(self):
+        """
+
+
+        """
         pass
-    #TODO: develop watch event processor
+        #TODO: develop watch event processor
 
 
 class ReleaseEventProcessor(EventProcessor):

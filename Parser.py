@@ -4,9 +4,10 @@ Parser.py
 Contains Parser class to download GitHub archives.
 """
 
+from logging import getLogger
 
-from yajl import *
-from collections import deque
+from FileSystemWorker import file_open
+
 
 
 #TODO: make parser using yajl
@@ -14,20 +15,42 @@ from collections import deque
 class Parser(object):
     """ Parser of JSON archives. """
 
-    def __init__(self, json_file):
-        self.json_file = json_file
+    def __init__(self):
+        self.json_file = None
         self.handler = ContentHandler()
-        self.line = deque() #popleft(), append()
+        self.line = None
 
-    def get_event(self):
-        """Returns event from line. If returns None => needs to download new files"""
-        if self.line:
-            event = self.line.popleft()
-            return event
+    def get_event(self, json_file):
+        """Returns event from line. If returns None => needs to download new files
+        :param json_file: file to read data from
+        """
+        if json_file is None:
+            if self.json_file is None:
+                return None
         else:
+            self.json_file = json_file
+            self.line = 0
+
+        json_file = file_open(self.json_file)
+        logger = getLogger('LOGGER')
+        if json_file is None:
+            logger.error(__name__ + ": " + "can't get event from file %s" % self.json_file)
             return None
 
-class ContentHandler(YajlContentHandler):
+        for line in range(self.line):
+            json_file.readline()
+
+        event = json_file.readline()
+        self.line += 1
+
+        if event is None:
+            logger.error(__name__ + ": " + "can't get event from line %d of file %s" % (self.line - 1, self.json_file))
+            return None
+
+        return event
+
+
+'''class ContentHandler(YajlContentHandler):
     def __init__(self):
         self.bracket_stack = deque() #append(), pop()
         self.event = None
@@ -65,4 +88,4 @@ class ContentHandler(YajlContentHandler):
         self.bracket_stack.append('[')
 
     def yajl_end_array(self, ctx):
-        self.bracket_stack.pop()
+        self.bracket_stack.pop()'''

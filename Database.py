@@ -109,15 +109,16 @@ class Database(object):
         json_file = open(file_name, "w")
         dump(storage, json_file)
 
-    def send_data(self, data):
+    @staticmethod
+    def send_data(data):
         """Accepts file and puts it into a database
         :param data: DBData
         """
 
-        return True  #returns True if all is ok, False otherwise
+        return True
 
 
-class DBData:
+class DBData(object):
     """Store data in good for DB format"""
 
     def __init__(self, datatype):
