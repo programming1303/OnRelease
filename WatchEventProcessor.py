@@ -21,4 +21,5 @@ class WatchEventProcessor(object):
                 data[key] = event[key]
             except ValueError:
                 self.logger.warning(__name__ + ": " + "Missing key %s in event %s" % (key, event))
+        data["data_type"] = "NewData"
         return data

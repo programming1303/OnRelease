@@ -13,7 +13,7 @@ from FileSystemWorker import file_open, json_string_load
 
 
 class Parser(object):
-    """ Parser of JSON archives. """
+    """ Methods of parsing of JSON files. """
 
     def __init__(self):
         self.json_file = None
@@ -22,8 +22,9 @@ class Parser(object):
         self.logger = getLogger('LOGGER')
 
     def get_event(self, json_file):
-        """Returns event from line. If returns None => needs to download new files
+        """
         :param json_file: file to read data from
+        :return: GitHub event if getting event was successful else None
         """
         if json_file is None or self.json_file == json_file:
             if self.json_file is None:

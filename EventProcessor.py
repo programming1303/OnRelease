@@ -30,7 +30,7 @@ class EventProcessor(object):
         try:
             return self.event["type"]
         except ValueError:
-            self.logger.warning(__name__ + ": " + "Missing type in event %s" % self.event)
+            self.logger.error(__name__ + ": " + "Missing type in event %s" % self.event)
             return "UnknownEvent"
 
     def change_event_url(self):
@@ -52,5 +52,3 @@ class EventProcessor(object):
 
         if event_type in self.parsers:
             return self.parsers[event_type].get_data_from_event(event)
-        else:
-            self.logger.error(__name__ + ": " + "Unknown event type %s" % event_type)

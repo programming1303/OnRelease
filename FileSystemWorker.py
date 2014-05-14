@@ -62,13 +62,14 @@ def json_string_load(string):
         logger.warning(__name__ + ": " + "not a JSON string %s" % string)
 
 
-def file_open(name):
+def file_open(name, mode="r"):
     """Opens a file
+    :param mode: way of using file ["r" -> read, "w" -> write, "a" -> append, etc.]
     :param name: name of file
     :return: file descriptor
     """
     logger = getLogger('LOGGER')
     try:
-        return open(name)
+        return open(name, mode)
     except IOError:
         logger.warning(__name__ + ": " + "no file %s" % name)

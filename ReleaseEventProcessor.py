@@ -15,10 +15,16 @@ class ReleaseEventProcessor(object):
         :param event: GitHub event
         :return: data for database
         """
-        data = {"actor": None, "url": None}
+        data = {"url": None, "repository": None}
+        print "!", event
         for key in data.keys():
             try:
                 data[key] = event[key]
             except ValueError:
                 self.logger.warning(__name__ + ": " + "Missing key %s in event %s" % (key, event))
+        try:
+            data["repository"] = data["repository"]["url"][19:]
+        except ValueError:
+            self.logger.warning(__name__ + ": " + "Missing url repo information in event %s" % event)
+        data["data_type"] = "PoolData"
         return data

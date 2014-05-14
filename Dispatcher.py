@@ -2,6 +2,7 @@
 """ Dispatcher.py """
 
 from logging.config import fileConfig
+
 from FileSystemWorker import create_or_check_path
 from Database import Database
 from EventProcessor import EventProcessor
@@ -34,6 +35,8 @@ class Dispatcher(object):
             getting_event_status = self.get_event()
             if getting_event_status:
                 processing_event_status = self.process_event()
+                if processing_event_status:
+                    self.process_data()
             else:
                 download_status = self.download()
 
@@ -58,8 +61,6 @@ class Dispatcher(object):
         self.new_data = self.event_processor.process_event(self.new_event)
         return False if self.new_data is None else True
 
-    def save_data(self):
+    def process_data(self):
         """ Sends data to Database. """
-        #TODO: choose data format
-        #TODO: DataBase processor
-        self.database.save_data(self.data)
+        self.database.process_data(self.new_data)
