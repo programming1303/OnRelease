@@ -1,13 +1,12 @@
 # encoding: utf-8
 """ Dispatcher.py """
 
-#from Database import Database
 from logging.config import fileConfig
-
+from FileSystemWorker import create_or_check_path
+from Database import Database
 from EventProcessor import EventProcessor
 from Parser import Parser
 from Downloader import Downloader
-from FileSystemWorker import create_or_check_path
 
 
 class Dispatcher(object):
@@ -19,7 +18,7 @@ class Dispatcher(object):
 
         fileConfig('config/logger.conf')
 
-        #self.database = Database()
+        self.database = Database()
         self.parser = Parser()
         self.event_processor = EventProcessor()
         self.downloader = Downloader()
@@ -59,12 +58,8 @@ class Dispatcher(object):
         self.new_data = self.event_processor.process_event(self.new_event)
         return False if self.new_data is None else True
 
-    @staticmethod
-    def send_to_database(data):
-        """ Sends data to Database.
-        :param data: data in DB format.
-        """
+    def save_data(self):
+        """ Sends data to Database. """
         #TODO: choose data format
         #TODO: DataBase processor
-        #self.database.send_data(self.data)
-
+        self.database.save_data(self.data)
