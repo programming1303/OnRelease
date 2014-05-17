@@ -2,7 +2,6 @@
 """ Dispatcher.py """
 
 from logging.config import fileConfig
-
 from FileSystemWorker import create_or_check_path
 from Database import Database
 from EventProcessor import EventProcessor
@@ -14,7 +13,6 @@ class Dispatcher(object):
     """ Dispatcher class to control process of working. """
 
     def __init__(self):
-        create_or_check_path("config/")
         create_or_check_path("logs/")
 
         fileConfig('config/logger.conf')
