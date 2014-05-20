@@ -1,10 +1,7 @@
 # encoding: utf-8
-"""
-Contains EventProcessor class and common methods.
-"""
+""" EventProcessor.py """
 
 from logging import getLogger
-
 from ReleaseEventProcessor import ReleaseEventProcessor
 from WatchEventProcessor import WatchEventProcessor
 
