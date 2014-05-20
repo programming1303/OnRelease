@@ -75,13 +75,9 @@ class Downloader(object):
             :param structure: tuple representation of time
             :return: GitHub archive time
             """
-
-            def join_number_to_zero(number):
-                """
-                :param number: positive int number
-                :return: adding number to 0 digit [9 -> 09, etc.]
-                """
-                return ("" if number > 9 else "0") + str(number)
+            
+            
+            join_number_to_zero = lambda number: ("" if number > 9 else "0") + str(number)
 
             return "%s-%s-%s-%s" % (
                 structure.tm_year, join_number_to_zero(structure.tm_mon), join_number_to_zero(structure.tm_mday),
